@@ -1,11 +1,9 @@
-import React from "react";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
 import { App } from "../../components";
 import BaselineContainer from "../BaselineContainer/BaselineContainer";
 import EntryFormContainer from "../EntryFormContainer/EntryFormContainer";
-import EntryListContainer from "../EntryListContainer/EntryListContainer";
-import ResultContainer from "../ResultContainer/ResultContainer";
+import OverviewContainer from "../OverviewContainer/OverviewContainer";
 
 const AppContainer = () => {
   const history = useHistory();
@@ -23,8 +21,7 @@ const AppContainer = () => {
           <EntryFormContainer />
         </Route>
         <Route path="/">
-          <ResultContainer />
-          <EntryListContainer />
+          <OverviewContainer />
         </Route>
       </Switch>
     </App>

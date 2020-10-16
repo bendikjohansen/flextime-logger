@@ -6,7 +6,7 @@ interface BaselineState {
 };
 
 const initialState: BaselineState = {
-  duration: 425
+  duration: 425 * 60
 }
 
 const baseline = createSlice({
@@ -22,4 +22,4 @@ const baseline = createSlice({
 export default baseline.reducer;
 export const { setDuration } = baseline.actions;
 
-export const selectDuration = (state: RootState) => state.baseline.duration;
+export const selectBaselineDuration = (state: RootState) => state.baseline.duration;

@@ -3,9 +3,9 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { makeStyles } from "@material-ui/core/styles";
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
-import ListIcon from '@material-ui/icons/List';
+import AddIcon from "@material-ui/icons/Add";
+import EditIcon from "@material-ui/icons/Edit";
+import ListIcon from "@material-ui/icons/List";
 import React from "react";
 
 interface Props {
@@ -19,7 +19,7 @@ const useStyles = makeStyles({
   root: {
     height: "100%",
     display: "flex",
-    flexDirection: 'column'
+    flexDirection: "column",
   },
 
   contentContainer: {
@@ -29,20 +29,39 @@ const useStyles = makeStyles({
   bottomNavigation: {
     justifyContent: "flex-end",
   },
+
+  bottomAction: {
+    paddingBottom: '20px'
+  }
 });
 
 const App = ({ children, listOnClick, addOnClick, editOnClick }: Props) => {
   const classes = useStyles();
 
   return (
-    <Box className={classes.root} padding={2} paddingBottom={0}>
+    <Box className={classes.root}>
       <Container className={classes.contentContainer}>
-        {children}
+        <Box padding={2}>{children}</Box>
       </Container>
       <BottomNavigation className={classes.bottomNavigation}>
-        <BottomNavigationAction onClick={listOnClick} label="List entries" icon={<ListIcon />} />
-        <BottomNavigationAction onClick={addOnClick} label="Add entry" icon={<AddIcon />} />
-        <BottomNavigationAction onClick={editOnClick} label="Edit baseline" icon={<EditIcon />} />
+        <BottomNavigationAction
+          className={classes.bottomAction}
+          onClick={listOnClick}
+          label="List entries"
+          icon={<ListIcon />}
+        />
+        <BottomNavigationAction
+          className={classes.bottomAction}
+          onClick={addOnClick}
+          label="Add entry"
+          icon={<AddIcon />}
+        />
+        <BottomNavigationAction
+          className={classes.bottomAction}
+          onClick={editOnClick}
+          label="Edit baseline"
+          icon={<EditIcon />}
+        />
       </BottomNavigation>
     </Box>
   );

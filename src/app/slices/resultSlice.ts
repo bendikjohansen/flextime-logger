@@ -1,37 +1,55 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { Entry } from "../types";
+import { setEntries } from "./entrySlice";
 
 interface ResultState {
   difference: number;
+  hours: number;
+  minutes: number;
 }
 
 const initialState: ResultState = {
   difference: 0,
+  hours: 0,
+  minutes: 0,
+};
+
+const calculateResult = (entry: Entry, baseline: number) => {
+  const workdayLength = entry.endTimestamp - entry.startTimestamp - entry.lunchDuration;
+  const expected = entry.dayOff ? 0 : baseline;
+  return workdayLength - expected;
+};
+
+const calculateTime = (
+  timeInMinutes: number
+): { hours: number; minutes: number } => {
+  const hours = Math.floor(timeInMinutes / 3600);
+  const minutesLeft = (timeInMinutes / 60) % (hours * 60);
+  const minutes = isNaN(minutesLeft) ? 0 : minutesLeft;
+
+  return { hours, minutes };
 };
 
 const resultSlice = createSlice({
   name: "result",
   initialState,
-  reducers: {
-    setTime: (state, { payload }: PayloadAction<Entry[]>) => {
-      const add = (value: number, entry: Entry) =>
-        value + entry.endTimestamp - entry.startTimestamp;
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(setEntries, (state, { payload }) => {
+      const getDifference = (entry: Entry) =>
+        calculateResult(entry, payload.baseline);
+      const add = (a: number, b: number) => a + b;
+      const differences = payload.entries.map(getDifference).reduce(add, 0);
+      const { hours, minutes } = calculateTime(differences);
 
-      state.difference = payload.reduce(add, 0);
-    },
-    addTime: (state, { payload }: PayloadAction<Entry>) => {
-      state.difference +=
-        (payload.endTimestamp - payload.startTimestamp) * 1000;
-    },
-    removeTime: (state, { payload }: PayloadAction<Entry>) => {
-      state.difference -=
-        (payload.endTimestamp - payload.startTimestamp) * 1000;
-    },
+      state.difference = differences;
+      state.hours = hours;
+      state.minutes = minutes;
+    });
   },
 });
 
 export default resultSlice.reducer;
-export const { setTime, addTime, removeTime } = resultSlice.actions;
 
-export const selectDifference = (state: RootState) => state.result.difference;
+export const selectResult = (state: RootState) => state.result;
