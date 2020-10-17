@@ -1,34 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { toEntryOutcome } from "../converters";
+import toTotalOutcome from "../converters/toTotalOutcome";
 import { RootState } from "../store";
-import { Entry } from "../types";
+import { Entry, EntryOutcome } from "../types";
 import { setEntries } from "./entrySlice";
 
 interface ResultState {
-  difference: number;
-  hours: number;
-  minutes: number;
+  total: {
+    hours: number;
+    minutes: number;
+  };
+  entries: EntryOutcome[];
 }
 
 const initialState: ResultState = {
-  difference: 0,
-  hours: 0,
-  minutes: 0,
-};
-
-const calculateResult = (entry: Entry, baseline: number) => {
-  const workdayLength = entry.endTimestamp - entry.startTimestamp - entry.lunchDuration;
-  const expected = entry.dayOff ? 0 : baseline;
-  return workdayLength - expected;
-};
-
-const calculateTime = (
-  timeInMinutes: number
-): { hours: number; minutes: number } => {
-  const hours = Math.floor(timeInMinutes / 3600);
-  const minutesLeft = (timeInMinutes / 60) % (hours * 60);
-  const minutes = isNaN(minutesLeft) ? 0 : minutesLeft;
-
-  return { hours, minutes };
+  total: {
+    hours: 0,
+    minutes: 0,
+  },
+  entries: [],
 };
 
 const resultSlice = createSlice({
@@ -37,19 +27,17 @@ const resultSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(setEntries, (state, { payload }) => {
-      const getDifference = (entry: Entry) =>
-        calculateResult(entry, payload.baseline);
-      const add = (a: number, b: number) => a + b;
-      const differences = payload.entries.map(getDifference).reduce(add, 0);
-      const { hours, minutes } = calculateTime(differences);
+      const convert = (e: Entry) => toEntryOutcome(e, payload.baseline);
+      const entries = payload.entries.map(e => e);
+      entries.sort((a, b) => b.startTimestamp - a.startTimestamp);
 
-      state.difference = differences;
-      state.hours = hours;
-      state.minutes = minutes;
+      state.entries = entries.map(convert);
+      state.total = toTotalOutcome(payload.entries, payload.baseline);
     });
   },
 });
 
 export default resultSlice.reducer;
 
-export const selectResult = (state: RootState) => state.result;
+export const selectTotalResult = (state: RootState) => state.result.total;
+export const selectResultsByDate = (state: RootState) => state.result.entries;
