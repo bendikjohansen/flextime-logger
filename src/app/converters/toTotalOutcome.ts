@@ -13,7 +13,7 @@ const isWeekend = (timestamp: number): boolean =>
 
 const toTotalOutcome = (
   entries: Entry[],
-  baseline: number
+  workdayLength: number
 ): { hours: number; minutes: number } => {
   const workdayLengths = entries.map((entry) => ({
     date: dayjs.unix(entry.startTimestamp).format(),
@@ -21,7 +21,7 @@ const toTotalOutcome = (
       entry.endTimestamp -
       entry.startTimestamp -
       entry.lunchDuration +
-      (isWeekend(entry.startTimestamp) ? baseline : 0),
+      (isWeekend(entry.startTimestamp) ? workdayLength : 0),
   }));
   const workdayLengthsPerDate = workdayLengths.reduce(
     (result, workday) => ({
@@ -34,12 +34,12 @@ const toTotalOutcome = (
     {} as DateOutcomeDict
   );
   const totalOutcome = Object.values(workdayLengthsPerDate).reduce(
-    (result, workday) => result + (workday.workdayLength - (workday.isWeekend ? 0 : baseline)) / 60,
+    (result, workday) => result + (workday.workdayLength - (workday.isWeekend ? 0 : workdayLength)) / 60,
     0
   );
 
   const hours = Math.floor(totalOutcome / 60);
-  const minutes = totalOutcome - hours * 60;
+  const minutes = Math.round(totalOutcome - hours * 60);
   return {
     hours,
     minutes,

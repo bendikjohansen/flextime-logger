@@ -4,10 +4,10 @@ import AppContainer from "../AppContainer/AppContainer";
 import { useAuth } from "./hooks";
 
 const AuthContainer = () => {
-  const userId = useAuth();
+  const isAuthenticated = useAuth();
 
   return (
-    <AuthPage userId={userId}>
+    <AuthPage isAuthenticated={isAuthenticated}>
       <AppContainer />
     </AuthPage>
   );
