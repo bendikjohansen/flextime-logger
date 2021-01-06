@@ -1,15 +1,17 @@
 import React from "react";
 import EntryListContainer from "./containers/EntryListContainer/EntryListContainer";
 import ResultContainer from "./containers/ResultContainer/ResultContainer";
-import { useEntryListener } from "./hooks";
+import useEntries from "./useEntries";
+import useWorkdayLength from "./useWorkdayLength";
 
 const OverviewContainer = () => {
-  useEntryListener();
+  const entries = useEntries();
+  const workdayLength = useWorkdayLength();
 
   return (
     <>
-      <ResultContainer />
-      <EntryListContainer />
+      <ResultContainer entries={entries} workdayLength={workdayLength} />
+      <EntryListContainer entries={entries} workdayLength={workdayLength} />
     </>
   );
 };

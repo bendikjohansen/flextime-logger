@@ -1,12 +1,20 @@
+import React from "react";
+import { Entry } from "../../../../app/types";
+import useTotalResult from "./useTotalResult";
 
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { selectTotalResult } from '../../../../app/slices/resultSlice';
-
-const ResultContainer = () => {
-  const { hours, minutes } = useSelector(selectTotalResult);
-
-return <p>Result: {hours} hours and {minutes} minutes.</p>;
+interface Props {
+  entries: Entry[];
+  workdayLength: number;
 }
+
+const ResultContainer = ({ entries, workdayLength }: Props) => {
+  const { hours, minutes } = useTotalResult(entries, workdayLength);
+
+  return (
+    <p>
+      Result: {hours} hours and {minutes} minutes.
+    </p>
+  );
+};
 
 export default ResultContainer;

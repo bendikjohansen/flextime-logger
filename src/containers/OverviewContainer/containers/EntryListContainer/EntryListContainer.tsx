@@ -1,12 +1,17 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { selectResultsByDate } from "../../../../app/slices/resultSlice";
+import { Entry } from "../../../../app/types";
 import { OverviewTable } from "../../../../components/overview";
+import useEntryList from "./useEntryList";
 
-const EntryListContainer = () => {
-  const outcomes = useSelector(selectResultsByDate);
+interface Props {
+  entries: Entry[];
+  workdayLength: number;
+}
 
-  return <OverviewTable outcomes={outcomes} onDelete={console.log} />
+const EntryListContainer = ({ entries, workdayLength }: Props) => {
+  const outcomes = useEntryList(entries, workdayLength);
+
+  return <OverviewTable outcomes={outcomes} onDelete={console.log} />;
 };
 
 export default EntryListContainer;
