@@ -22,7 +22,7 @@ const AuthPage = ({ children, isAuthenticated }: Props) => {
         <DialogTitle>You are not logged in</DialogTitle>
         <Button onClick={login}>Log in</Button>
       </Dialog>
-      {children}
+      {isAuthenticated && children}
     </>
   );
 };
