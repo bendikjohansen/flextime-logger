@@ -1,48 +1,44 @@
 import dayjs from "dayjs";
 import { Entry } from "../types";
 
-type DateOutcomeDict = {
-  [date: string]: {
-    isWeekend: boolean;
-    workdayLength: number;
-  };
-};
+interface Outcome {
+  [date: string]: number;
+}
+interface DayOffDict {
+  [date: string]: boolean;
+}
 
-const isWeekend = (timestamp: number): boolean =>
-  [0, 6].includes(dayjs.unix(timestamp).day());
+const getDate = (entry: Entry) =>
+  dayjs.unix(entry.startTimestamp).toISOString();
+
+const getWorkTime = (entry: Entry) =>
+  (entry.endTimestamp - entry.startTimestamp) / 60 - entry.lunchDuration;
+
+const addWork = (result: Outcome, entry: Entry) => ({
+  ...result,
+  [getDate(entry)]: (result[getDate(entry)] ?? 0) + getWorkTime(entry),
+});
+
+const isDayOff = (result: DayOffDict, entry: Entry) => ({
+  ...result,
+  [getDate(entry)]: result[getDate(entry)] || entry.dayOff,
+});
 
 const toTotalOutcome = (
   entries: Entry[],
   workdayLength: number
 ): { hours: number; minutes: number } => {
-  const workdayLengths = entries.map((entry) => ({
-    date: dayjs.unix(entry.startTimestamp).format(),
-    workdayLength:
-      entry.endTimestamp -
-      entry.startTimestamp -
-      entry.lunchDuration +
-      (isWeekend(entry.startTimestamp) ? workdayLength : 0),
-  }));
-  const workdayLengthsPerDate = workdayLengths.reduce(
-    (result, workday) => ({
-      ...result,
-      [workday.date]: {
-        workdayLength: (result[workday.date]?.workdayLength ?? 0) + workday.workdayLength,
-        isWeekend: result[workday.date]?.isWeekend ?? isWeekend(dayjs(workday.date).unix())
-      },
-    }),
-    {} as DateOutcomeDict
-  );
-  const totalOutcome = Object.values(workdayLengthsPerDate).reduce(
-    (result, workday) => result + (workday.workdayLength - (workday.isWeekend ? 0 : workdayLength)) / 60,
-    0
-  );
+  const workdayLengths = entries.reduce<Outcome>(addWork, {});
+  const dayOffMap = entries.reduce<DayOffDict>(isDayOff, {});
 
-  const hours = Math.floor(totalOutcome / 60);
-  const minutes = Math.round(totalOutcome - hours * 60);
+  const getMinutesToSpare = ([date, value]: [string, number]) =>
+    value - (dayOffMap[date] ? 0 : workdayLength);
+  const actualWork = Object.entries(workdayLengths).map(getMinutesToSpare);
+  const totalMinutes = actualWork.reduce((a, b) => a + b, 0);
+
   return {
-    hours,
-    minutes,
+    hours: Math.floor(totalMinutes / 60),
+    minutes: totalMinutes % 60,
   };
 };
 
