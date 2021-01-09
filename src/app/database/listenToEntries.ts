@@ -8,7 +8,7 @@ const listenToEntries = (callback: (entries: Entry[]) => void) => {
     return;
   }
 
-  firebase
+  return firebase
     .firestore()
     .collection(`entries/${user?.uid}/list`)
     .onSnapshot((collection) => {

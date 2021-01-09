@@ -6,9 +6,11 @@ const useEntries = () => {
   const [entries, setEntries] = useState<Entry[]>([]);
 
   useEffect(() => {
-    listenToEntries((fetchedEntries) => {
+    const unsubscribe = listenToEntries((fetchedEntries) => {
       setEntries(fetchedEntries);
     });
+
+    return unsubscribe;
   }, []);
 
   return entries;
