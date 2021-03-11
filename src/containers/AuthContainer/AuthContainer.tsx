@@ -5,7 +5,6 @@ import { useAuth } from "./hooks";
 
 const AuthContainer = () => {
   const isAuthenticated = useAuth();
-
   return (
     <AuthPage isAuthenticated={isAuthenticated}>
       <AppContainer />
