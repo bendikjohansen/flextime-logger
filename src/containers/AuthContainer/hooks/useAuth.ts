@@ -6,7 +6,7 @@ const useAuth = (): boolean => {
   const [authenticated, setAuthenticated] = useState(false);
 
   firebase.auth().onAuthStateChanged((user) => {
-    setAuthenticated(user !== undefined);
+    setAuthenticated(user !== null);
   });
 
   return authenticated;

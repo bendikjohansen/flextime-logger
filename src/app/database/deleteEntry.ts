@@ -6,8 +6,6 @@ const deleteEntry = async (entryId: string): Promise<void> => {
   if (!user) {
     return;
   }
-  console.log(`entries/${user?.uid}/list/${entryId}`)
-
   firebase.firestore().doc(`entries/${user?.uid}/list/${entryId}`).delete();
 };
 
